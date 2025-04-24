@@ -1,0 +1,139 @@
+{% extends 'forum/base.html' %}
+{% block content %}
+<h2 class="mb-4">Forum Topics</h2>
+
+<!-- Tag Filter as clickable badges -->
+<div class="mb-3">
+  <label class="form-label fw-bold">Filter by Tags:</label>
+  <div id="tag-filter">
+    {% for tag in all_tags %}
+      <span class="badge bg-primary tag-badge" data-tag-id="{{ tag.id }}">{{ tag.name }}</span>
+    {% endfor %}
+    <span class="badge bg-secondary tag-badge" data-tag-id="all">All</span>
+  </div>
+</div>
+
+<!-- Display pinned topics -->
+<h3>Pinned Topics</h3>
+<div id="pinned-topics" class="row row-cols-1 row-cols-md-2 g-4">
+  {% for topic in pinned_topics %}
+  <div class="col">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">{{ topic.title }}</h5>
+        <p class="card-text">{{ topic.content|truncatechars:150 }}</p>
+        <p class="text-muted">
+          By {{ topic.author.username }}
+          {% if topic.author.is_staff %}<span class="admin-flair">Admin</span>{% endif %}
+        </p>
+        <a href="{% url 'topic_detail' topic.pk %}" class="btn btn-primary">View Topic</a>
+        {% if user.is_staff %}
+          <form method="post" action="{% url 'toggle_pin_topic' topic.id 'unpin' %}" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-warning">Unpin</button>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <p>No pinned topics available.</p>
+  {% endfor %}
+</div>
+
+<!-- Display other topics -->
+<h3 class="mt-4">All Topics</h3>
+<div id="other-topics" class="row row-cols-1 row-cols-md-2 g-4">
+  {% for topic in other_topics %}
+  <div class="col">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">{{ topic.title }}</h5>
+        <p class="card-text">{{ topic.content|truncatechars:150 }}</p>
+        <p class="text-muted">
+          By {{ topic.author.username }}
+          {% if topic.author.is_staff %}<span class="admin-flair">Admin</span>{% endif %}
+        </p>
+        <a href="{% url 'topic_detail' topic.pk %}" class="btn btn-primary">View Topic</a>
+        {% if user.is_staff %}
+          <form method="post" action="{% url 'toggle_pin_topic' topic.id 'pin' %}" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success">Pin</button>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <p>No topics available.</p>
+  {% endfor %}
+</div>
+
+{% if user.is_authenticated %}
+<a href="{% url 'create_topic' %}" class="btn btn-success mt-4">Create New Topic</a>
+{% endif %}
+
+<script>
+  const tagBadges = document.querySelectorAll('.tag-badge');
+  tagBadges.forEach(badge => {
+    badge.addEventListener('click', function() {
+      tagBadges.forEach(b => b.classList.remove('selected'));
+      this.classList.add('selected');
+      const selectedTagId = this.getAttribute('data-tag-id');
+      let url = "{% url 'filter_topics' %}";
+      if(selectedTagId && selectedTagId !== 'all'){
+        url += '?tags[]=' + selectedTagId;
+      }
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          const pinnedTopicsDiv = document.getElementById('pinned-topics');
+          const otherTopicsDiv = document.getElementById('other-topics');
+          pinnedTopicsDiv.innerHTML = '';
+          otherTopicsDiv.innerHTML = '';
+          data.pinned_topics.forEach(topic => {
+            pinnedTopicsDiv.innerHTML += `
+              <div class="col">
+                <div class="card">
+                  <div class="card-body">
+                    <h5 class="card-title">${topic.title}</h5>
+                    <p class="card-text">${topic.content}</p>
+                    <p class="text-muted">By ${topic.author}</p>
+                    <a href="/topic/${topic.id}/" class="btn btn-primary">View Topic</a>
+                    {% if user.is_staff %}
+                      <form method="post" action="/admin_dashboard/topic/${topic.id}/unpin/" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-warning">Unpin</button>
+                      </form>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            `;
+          });
+          data.other_topics.forEach(topic => {
+            otherTopicsDiv.innerHTML += `
+              <div class="col">
+                <div class="card">
+                  <div class="card-body">
+                    <h5 class="card-title">${topic.title}</h5>
+                    <p class="card-text">${topic.content}</p>
+                    <p class="text-muted">By ${topic.author}</p>
+                    <a href="/topic/${topic.id}/" class="btn btn-primary">View Topic</a>
+                    {% if user.is_staff %}
+                      <form method="post" action="/admin_dashboard/topic/${topic.id}/pin/" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success">Pin</button>
+                      </form>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            `;
+          });
+        })
+        .catch(error => console.error('Error:', error));
+    });
+  });
+</script>
+{% endblock %}

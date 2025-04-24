@@ -1,0 +1,57 @@
+{% extends 'forum/base.html' %}
+{% block content %}
+<div class="card mb-4" style="background-color: rgba(0,0,0,0.8);">
+  <div class="card-body">
+    <h2 class="card-title" style="color: white;">{{ topic.title }}</h2>
+    <p class="card-text" style="color: white;">{{ topic.content }}</p>
+    <p><small style="color: white;">Posted by {{ topic.author.username }} on {{ topic.created_at }}</small></p>
+    <div class="mb-3">
+      {% if user.is_staff or user == topic.author %}
+        <a href="{% url 'edit_topic' topic.id %}" class="btn btn-info">Edit Topic</a>
+      {% endif %}
+      {% if user.is_staff %}
+        {% if topic.pinned %}
+          <form method="post" action="{% url 'toggle_pin_topic' topic.id 'unpin' %}" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-warning">Unpin Topic</button>
+          </form>
+        {% else %}
+          <form method="post" action="{% url 'toggle_pin_topic' topic.id 'pin' %}" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success">Pin Topic</button>
+          </form>
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+</div>
+<div class="card mb-4" style="background-color: rgba(0,0,0,0.8);">
+  <div class="card-body">
+    <h3 class="card-title" style="color: white;">Comments</h3>
+    {% for post in posts %}
+      <div class="mb-3" style="border-bottom: 1px solid #444; padding-bottom: 10px;">
+        <p style="color: white;"><strong>{{ post.author.username }}</strong> <small>{{ post.created_at }}</small></p>
+        <p style="color: white;">{{ post.content }}</p>
+      </div>
+    {% empty %}
+      <p style="color: white;">No comments yet.</p>
+    {% endfor %}
+  </div>
+</div>
+{% if user.is_authenticated %}
+<div class="card" style="background-color: rgba(0,0,0,0.8);">
+  <div class="card-body">
+    <h3 class="card-title" style="color: white;">Add a Comment</h3>
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-3">
+        <textarea name="content" rows="4" class="form-control" placeholder="Write your comment here..." style="color: white; background-color: #333;"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary w-100">Post Comment</button>
+    </form>
+  </div>
+</div>
+{% else %}
+<p style="color: white;">You must be <a href="{% url 'login' %}" style="color: #ffc107;">logged in</a> to post a comment.</p>
+{% endif %}
+{% endblock %}

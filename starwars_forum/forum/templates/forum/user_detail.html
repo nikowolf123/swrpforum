@@ -1,0 +1,59 @@
+{% extends 'forum/base.html' %}
+{% block content %}
+<h2>User Detail: {{ user_obj.username }}</h2>
+<p><strong>Email:</strong> {{ user_obj.email }}</p>
+<p><strong>First Name:</strong> {{ user_obj.first_name }}</p>
+<p><strong>Last Name:</strong> {{ user_obj.last_name }}</p>
+<p><strong>Status:</strong> {% if user_obj.is_active %}Active{% else %}Banned{% endif %}</p>
+<p>
+    <strong>Timeout:</strong>
+    {% if moderation.timeout_until and moderation.timeout_until > now %}
+        Timed out until {{ moderation.timeout_until }}
+    {% else %}
+        Not timed out.
+    {% endif %}
+</p>
+
+<div class="mb-3">
+    <form method="post" action="{% url 'user_action' user_obj.id 'ban' %}" class="d-inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Ban</button>
+    </form>
+    <form method="post" action="{% url 'user_action' user_obj.id 'unban' %}" class="d-inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success">Unban</button>
+    </form>
+    <form method="post" action="{% url 'user_action' user_obj.id 'timeout' %}" class="d-inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-warning">Timeout (15 mins)</button>
+    </form>
+    <form method="post" action="{% url 'user_action' user_obj.id 'remove_timeout' %}" class="d-inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-secondary">Remove Timeout</button>
+    </form>
+</div>
+
+<div class="mb-3">
+  <form method="post" action="{% url 'set_timeout' user_obj.id %}">
+    {% csrf_token %}
+    <div class="input-group">
+      <input type="number" name="timeout_minutes" class="form-control" placeholder="Custom timeout in minutes">
+      <button type="submit" class="btn btn-info">Set Timeout</button>
+    </div>
+  </form>
+</div>
+
+<h3>Post History</h3>
+{% if posts %}
+    <ul class="list-group">
+        {% for post in posts %}
+        <li class="list-group-item">
+            <small class="text-muted">{{ post.created_at }}</small>
+            <p>{{ post.content }}</p>
+        </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No posts found for this user.</p>
+{% endif %}
+{% endblock %}

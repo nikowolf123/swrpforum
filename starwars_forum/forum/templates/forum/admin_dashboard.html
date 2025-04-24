@@ -1,0 +1,86 @@
+{% extends 'forum/base.html' %}
+{% block content %}
+<h2 class="mb-4">Admin Dashboard</h2>
+<div class="row mb-4">
+  <div class="col-md-4">
+    <div class="card text-bg-info mb-3">
+      <div class="card-header">Total Topics</div>
+      <div class="card-body">
+        <h5 class="card-title">{{ total_topics }}</h5>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card text-bg-warning mb-3">
+      <div class="card-header">Total Posts</div>
+      <div class="card-body">
+        <h5 class="card-title">{{ total_posts }}</h5>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card text-bg-success mb-3">
+      <div class="card-header">Total Users</div>
+      <div class="card-body">
+        <h5 class="card-title">{{ total_users }}</h5>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row mb-4">
+  <div class="col-md-6">
+    <div class="card" style="background-color: rgba(0,0,0,0.8);">
+      <div class="card-header" style="color: white;">Latest Topics</div>
+      <ul class="list-group list-group-flush">
+        {% for topic in latest_topics %}
+          <li class="list-group-item" style="background-color: #333; color: white;">
+            <a href="{% url 'topic_detail' topic.id %}" style="color: #ffc107;">{{ topic.title }}</a>
+            <br><small>By {{ topic.author.username }} on {{ topic.created_at }}</small>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card" style="background-color: rgba(0,0,0,0.8);">
+      <div class="card-header" style="color: white;">Latest Posts</div>
+      <ul class="list-group list-group-flush">
+        {% for post in latest_posts %}
+          <li class="list-group-item" style="background-color: #333; color: white;">
+            <a href="{% url 'topic_detail' post.topic.id %}" style="color: #ffc107;">{{ post.topic.title }}</a>
+            <br><small>By {{ post.author.username }} on {{ post.created_at }}</small>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="row mb-4">
+  <div class="col-md-6">
+    <div class="card" style="background-color: rgba(0,0,0,0.8);">
+      <div class="card-header" style="color: white;">Recent Users</div>
+      <ul class="list-group list-group-flush">
+        {% for user in recent_users %}
+          <li class="list-group-item" style="background-color: #333; color: white;">
+            {{ user.username }} <br><small>{{ user.email }}</small>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card" style="background-color: rgba(0,0,0,0.8);">
+      <div class="card-header" style="color: white;">Top Active Users</div>
+      <ul class="list-group list-group-flush">
+        {% for user in top_active_users %}
+          <li class="list-group-item" style="background-color: #333; color: white;">
+            {{ user.username }} <br><small>{{ user.num_posts }} posts</small>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

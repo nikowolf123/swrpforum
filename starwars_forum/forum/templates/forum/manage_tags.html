@@ -1,0 +1,27 @@
+{% extends 'forum/base.html' %}
+{% block content %}
+<h2>Manage Tags</h2>
+<form method="post" class="mb-4">
+    {% csrf_token %}
+    <div class="input-group">
+        <input type="text" name="name" class="form-control" placeholder="New tag name" required>
+        <button type="submit" class="btn btn-primary">Add Tag</button>
+    </div>
+</form>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Tag Name</th>
+            <th>Slug</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for tag in tags %}
+        <tr>
+            <td>{{ tag.name }}</td>
+            <td>{{ tag.slug }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'forum/base.html' %}
+{% block content %}
+<div class="card mx-auto" style="max-width: 700px; background-color: rgba(0,0,0,0.8);">
+  <div class="card-body">
+    <h2 class="card-title text-center mb-4" style="color: white;">Edit Topic: {{ topic.title }}</h2>
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label for="id_title" class="form-label" style="color: white;">Title</label>
+        <input type="text" name="title" id="id_title" class="form-control" value="{{ form.title.value|default_if_none:'' }}" style="color: white; background-color: #333;">
+      </div>
+      <div class="mb-3">
+        <label for="id_content" class="form-label" style="color: white;">Content</label>
+        <textarea name="content" id="id_content" rows="5" class="form-control" style="color: white; background-color: #333;">{{ form.content.value|default_if_none:'' }}</textarea>
+      </div>
+      <div class="mb-3">
+        <label for="id_tags" class="form-label" style="color: white;">Tags (Ctrl+Click to select multiple)</label>
+        <select name="tags" id="id_tags" class="form-select" multiple style="color: white; background-color: #333;">
+          {% for tag in form.fields.tags.queryset %}
+            <option value="{{ tag.id }}" {% if tag in form.instance.tags.all %}selected{% endif %}>
+              {{ tag.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      {% if user.is_staff %}
+      <div class="mb-3">
+        <label for="id_pinned" class="form-label" style="color: white;">Pin this Topic?</label>
+        <select name="pinned" id="id_pinned" class="form-select" style="color: white; background-color: #333;">
+          <option value="False" {% if not form.instance.pinned %}selected{% endif %}>No</option>
+          <option value="True" {% if form.instance.pinned %}selected{% endif %}>Yes</option>
+        </select>
+      </div>
+      {% endif %}
+      <button type="submit" class="btn btn-success w-100">Save Changes</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'forum/base.html' %}
+{% block content %}
+<div class="card mx-auto" style="max-width: 500px; background-color: rgba(0,0,0,0.8);">
+  <div class="card-body">
+    <h2 class="card-title text-center mb-4" style="color: white;">Manage Your Account</h2>
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label for="id_username" class="form-label" style="color: white;">Username</label>
+        <input type="text" name="username" id="id_username" class="form-control" value="{{ form.username.value }}" style="color: white; background-color: #333;">
+      </div>
+      <div class="mb-3">
+        <label for="id_email" class="form-label" style="color: white;">Email</label>
+        <input type="email" name="email" id="id_email" class="form-control" value="{{ form.email.value }}" style="color: white; background-color: #333;">
+      </div>
+      <div class="mb-3">
+        <label for="id_first_name" class="form-label" style="color: white;">First Name</label>
+        <input type="text" name="first_name" id="id_first_name" class="form-control" value="{{ form.first_name.value }}" style="color: white; background-color: #333;">
+      </div>
+      <div class="mb-3">
+        <label for="id_last_name" class="form-label" style="color: white;">Last Name</label>
+        <input type="text" name="last_name" id="id_last_name" class="form-control" value="{{ form.last_name.value }}" style="color: white; background-color: #333;">
+      </div>
+      <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
