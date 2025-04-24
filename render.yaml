@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: swrpforum
+    env: python
+    startCommand: "gunicorn swrpforum.wsgi:application"
+    plan: free
